@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: db_name
+    ports:
+      - 5433:5432
+  fastapi:
+    build: ./
+    volumes:
+    - .:/app
+    ports:
+      - 8000:80
+    restart: always
