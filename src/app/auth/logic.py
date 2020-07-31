@@ -16,7 +16,7 @@ from src.app.user import schemas
 
 from .jwt import ALGORITHM
 from .schemas import TokenPayload, VerificationInDB
-from .service import auth_verify
+from .crud import auth_verify
 from .send_email import send_new_account_email
 
 password_reset_jwt_subject = "preset"
