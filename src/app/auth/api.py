@@ -4,7 +4,10 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from starlette.responses import JSONResponse
+
 from src.config import settings
+from src.config.social_app import social_auth
 from src.app.base.utils.db import get_db
 
 from src.app.user import models
@@ -12,16 +15,18 @@ from src.app.user import schemas
 from src.app.user import crud
 
 from .schemas import Token, Msg, VerificationInDB
-from .logic import get_current_user
+from .permissions import get_current_user
 from .jwt import create_access_token
 from .security import get_password_hash
 from .send_email import send_reset_password_email
-from .logic import (
+from .service import (
     generate_password_reset_token,
     verify_password_reset_token,
     registration_user,
     verify_registration_user
 )
+
+
 
 auth_router = APIRouter()
 
@@ -67,11 +72,11 @@ def confirm_email(uuid: VerificationInDB, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Not found")
 
 
-@auth_router.post("/login/test-token", response_model=schemas.User)
-def test_token(current_user: models.User = Depends(get_current_user)):
-    """ Test access token
-    """
-    return current_user
+# @auth_router.post("/login/test-token", response_model=schemas.User)
+# def test_token(current_user: models.User = Depends(get_current_user)):
+#     """ Test access token
+#     """
+#     return current_user
 
 
 @auth_router.post("/password-recovery/{email}", response_model=Msg)
@@ -112,3 +117,21 @@ def reset_password(token: str = Body(...), new_password: str = Body(...), db: Se
     db.add(user)
     db.commit()
     return {"msg": "Password updated successfully"}
+
+
+@auth_router.route('/')
+async def login(request):
+    github = social_auth.create_client('github')
+    redirect_uri = 'http://localhost:8000/api/v1/github_login'
+    return await github.authorize_redirect(request, redirect_uri)
+
+
+@auth_router.route('/github_login')
+async def authorize(request):
+    token = await social_auth.github.authorize_access_token(request)
+    resp = await social_auth.github.get('user', token=token)
+    profile = resp.json()
+    print('*'*10)
+    print(profile)
+    print('*' * 10)
+    return JSONResponse(profile)
