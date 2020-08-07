@@ -12,6 +12,7 @@ db.sqlite3
 venv
 .env
 local_config.py
+social_app.py
 
 __pycache__/
 */__pycache__/
