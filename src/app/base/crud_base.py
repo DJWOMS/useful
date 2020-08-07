@@ -23,6 +23,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
+    def exists(self, db_session: Session, **kwargs):
+        return db_session.query(
+            db_session.query(self.model.id).filter_by(**kwargs).exists()
+        ).scalar()
+
     def get_object_or_404(self, db_session: Session, id: int) -> Optional[ModelType]:
         pass
 

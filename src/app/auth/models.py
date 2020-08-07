@@ -5,7 +5,7 @@ from src.db.session import Base
 
 
 class Verification(Base):
-    """Модель для подтверждения регистрации пользователя
+    """ Модель для подтверждения регистрации пользователя
     """
     __tablename__ = "auth_verification"
 
