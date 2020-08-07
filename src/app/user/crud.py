@@ -11,15 +11,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     """ CRUD for user
     """
     def get_by_email(self, db_session: Session, *, email: str) -> Optional[User]:
-        return db_session.query(User).filter(User.email == email).first()
+        return db_session.query(self.model).filter(self.model.email == email).first()
 
     def get_by_username(self, db_session: Session, *, username: str) -> Optional[User]:
-        return db_session.query(User).filter(User.username == username).first()
+        return db_session.query(self.model).filter(self.model.username == username).first()
 
     def get_by_username_email(
             self, db_session: Session, *, username: str, email: str
     ) -> Optional[User]:
-        return db_session.query(User).filter(User.username == username, User.email == email).first()
+        return self.exists(db_session, username=username, email=email)
 
     def create(self, db_session: Session, *, obj_in: UserCreate) -> User:
         db_obj = User(
