@@ -21,7 +21,13 @@ class Msg(BaseModel):
     msg: str
 
 
-class VerificationInDB(BaseModel):
+class VerificationCreate(BaseModel):
+    """ Схема для проверки email при регистрации
+    """
+    user_id: int
+
+
+class VerificationOut(BaseModel):
     """ Схема для проверки email при регистрации
     """
     link: UUID

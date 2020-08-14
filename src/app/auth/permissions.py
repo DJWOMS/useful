@@ -33,14 +33,14 @@ def get_current_user(db: Session = Depends(get_db), token: str = Security(reusab
     return user
 
 
-def get_active_user(current_user: User = Security(get_current_user)):
+def get_user(current_user: User = Security(get_current_user)):
     """Проверка активный юзер или нет"""
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-def get_current_active_superuser(current_user: User = Security(get_current_user)):
+def get_superuser(current_user: User = Security(get_current_user)):
     """Проверка суперюзер или нет"""
     if not crud.user.is_superuser(current_user):
         raise HTTPException(

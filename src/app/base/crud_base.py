@@ -23,43 +23,44 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def exists(self, db_session: Session, **kwargs):
-        return db_session.query(
-            db_session.query(self.model.id).filter_by(**kwargs).exists()
+    def exists(self, db: Session, **kwargs):
+        return db.query(
+            db.query(self.model.id).filter_by(**kwargs).exists()
         ).scalar()
 
-    def get_object_or_404(self, db_session: Session, id: int) -> Optional[ModelType]:
+    def get_object_or_404(self, db: Session, id: int) -> Optional[ModelType]:
         pass
 
-    def get(self, db_session: Session, id: int) -> Optional[ModelType]:
-        return db_session.query(self.model).filter(self.model.id == id).first()
+    def get(self, db: Session, **kwargs) -> Optional[ModelType]:
+        return db.query(self.model).filter_by(**kwargs).first()
 
-    def get_multi(self, db_session: Session, *, skip=0, limit=100) -> List[ModelType]:
-        return db_session.query(self.model).offset(skip).limit(limit).all()
+    def all(self, db: Session, *args, skip=0, limit=100) -> List[ModelType]:
+        return db.query(self.model).offset(skip).limit(limit).all()
 
-    def create(self, db_session: Session, *, obj_in: CreateSchemaType, **kwargs) -> ModelType:
-        obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data)
-        db_session.add(db_obj)
-        db_session.commit()
-        db_session.refresh(db_obj)
+    def filter(self, db: Session, *args, **kwargs) -> List[ModelType]:
+        return db.query(self.model).filter_by(**kwargs)
+
+    def create(self, db: Session, *args, schema: CreateSchemaType, **kwargs) -> ModelType:
+        obj_in_data = jsonable_encoder(schema)
+        db_obj = self.model(**obj_in_data, **kwargs)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
-    def update(
-        self, db_session: Session, *, db_obj: ModelType, obj_in: UpdateSchemaType
-    ) -> ModelType:
-        obj_data = jsonable_encoder(db_obj)
-        update_data = obj_in.dict(skip_defaults=True)
+    def update(self, db: Session, *args, model: ModelType, schema: UpdateSchemaType) -> ModelType:
+        obj_data = jsonable_encoder(model)
+        update_data = schema.dict(skip_defaults=True)
         for field in obj_data:
             if field in update_data:
-                setattr(db_obj, field, update_data[field])
-        db_session.add(db_obj)
-        db_session.commit()
-        db_session.refresh(db_obj)
-        return db_obj
+                setattr(model, field, update_data[field])
+        db.add(model)
+        db.commit()
+        db.refresh(model)
+        return model
 
-    def remove(self, db_session: Session, *, id: int) -> ModelType:
-        obj = db_session.query(self.model).get(id)
-        db_session.delete(obj)
-        db_session.commit()
+    def remove(self, db: Session, *args, **kwargs) -> ModelType:
+        obj = self.get(db, **kwargs)
+        db.delete(obj)
+        db.commit()
         return obj

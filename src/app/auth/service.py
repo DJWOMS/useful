@@ -11,35 +11,35 @@ from src.app.user import schemas
 from src.app.user import crud
 from .crud import auth_verify
 from .send_email import send_new_account_email
-from .schemas import VerificationInDB
+from .schemas import VerificationOut, VerificationCreate
 
 password_reset_jwt_subject = "preset"
 
 
-def registration_user(new_user: schemas.UserCreateInRegistration, db: Session):
+def registration_user(new_user: schemas.UserCreateInRegistration, db: Session) -> bool:
     """Регистрация пользователя"""
     if crud.user.get_by_username_email(db, username=new_user.username, email=new_user.email):
         return True
     else:
-        user = crud.user.create(db, obj_in=new_user)
-        verify = auth_verify.create(db, user.id)
+        user = crud.user.create(db, schema=new_user)
+        verify = auth_verify.create(db, schema=VerificationCreate(user_id=user.id))
         send_new_account_email(new_user.email, new_user.username, new_user.password, verify.link)
         return False
 
 
-def verify_registration_user(uuid: VerificationInDB, db: Session):
+def verify_registration_user(uuid: VerificationOut, db: Session) -> bool:
     """Подтверждение email пользователя"""
-    verify = auth_verify.get(db, uuid.link)
+    verify = auth_verify.get(db, link=uuid.link)
     if verify:
-        user = crud.user.get(db, verify.user_id)
-        crud.user.update(db, db_obj=user, obj_in=schemas.UserUpdate(**{"is_active": "true"}))
+        user = crud.user.get(db, id=verify.user_id)
+        crud.user.update(db, model=user, schema=schemas.UserUpdate(**{"is_active": "true"}))
         auth_verify.remove(db, uuid.link)
         return True
     else:
         return False
 
 
-def generate_password_reset_token(email):
+def generate_password_reset_token(email: str):
     delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
     now = datetime.utcnow()
     expires = now + delta
@@ -52,7 +52,7 @@ def generate_password_reset_token(email):
     return encoded_jwt
 
 
-def verify_password_reset_token(token) -> Optional[str]:
+def verify_password_reset_token(token: str) -> Optional[str]:
     try:
         decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         assert decoded_token["sub"] == password_reset_jwt_subject
