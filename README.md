@@ -55,20 +55,20 @@
     
 ##### 7) Создать миграции
 
-    docker exec -it useful_back poetry run alembic revision --autogenerate
+    docker exec -it useful-back poetry run alembic revision --autogenerate
     
 ##### 8) Выполнить миграции
 
-    docker exec -it useful_back poetry run alembic upgrade head
+    docker exec -it useful-back poetry run alembic upgrade head
     
 ##### 9) Создать суперюзера
 
-    docker exec -it useful_back python scripts/createsuperuser.py
+    docker exec -it useful-back python scripts/createsuperuser.py
 
 ##### 10) Если не выполняет команды
 
-- Войти в контейнер - _docker exec -it useful_back bash_
-- Выполнить команды без _docker exec -it useful_back_ 
+- Войти в контейнер - _docker exec -it useful-back bash_
+- Выполнить команды без _docker exec -it useful-back_ 
                                                         
 ##### 10) Если нужно очистить БД
 

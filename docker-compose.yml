@@ -5,8 +5,8 @@ services:
     container_name: useful-db
     image: postgres:12
     restart: always
-#    env_file:
-#      - ./.env.dev
+    env_file:
+      - ./.env.dev
     ports:
       - 5433:5432
     volumes:
