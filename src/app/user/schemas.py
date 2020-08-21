@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserBase(BaseModel):
@@ -21,16 +21,17 @@ class UserCreate(UserBaseInDB):
     """ Свойства для получения через API при создании из админки
     """
     username: str
-    email: str
+    email: EmailStr
     password: str
     first_name: str
+    avatar: str = None
 
 
 class UserCreateInRegistration(BaseModel):
     """ Свойства для получения через API при регистрации
     """
     username: str
-    email: str
+    email: EmailStr
     password: str
     first_name: str
 
@@ -56,10 +57,25 @@ class UserInDB(UserBaseInDB):
     password: str
 
 
+class SocialAccount(BaseModel):
+    """ Schema social accounts
+    """
+    account_id: int
+    account_url: str
+    account_login: str
+    account_name: str
+    avatar_url: str
+    provider: str
+
+    class Config:
+        orm_mode = True
+
+
 class UserPublic(UserBase):
     """ For public profile user
     """
     id: int
+    # social_account: SocialAccount
 
     class Config:
         orm_mode = True

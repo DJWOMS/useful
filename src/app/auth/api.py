@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -10,9 +10,7 @@ from src.config import settings
 from src.config.social_app import social_auth
 from src.app.base.utils.db import get_db
 
-from src.app.user import models
-from src.app.user import schemas
-from src.app.user import crud
+from src.app.user import service, crud, schemas
 
 from .schemas import Token, Msg, VerificationOut
 from .permissions import get_current_user
@@ -108,19 +106,32 @@ def reset_password(
     return {"msg": "Password updated successfully"}
 
 
-@auth_router.route('/')
-async def login(request):
+@auth_router.get('/')
+async def login(request: Request):
     github = social_auth.create_client('github')
-    redirect_uri = 'http://localhost:8000/api/v1/github_login'
+    redirect_uri = 'http://localhost:8000/api/v1/auth/github_login'
     return await github.authorize_redirect(request, redirect_uri)
 
 
-@auth_router.route('/github_login')
-async def authorize(request):
+@auth_router.get('/github_login')
+async def authorize(request: Request, db: Session = Depends(get_db)):
     token = await social_auth.github.authorize_access_token(request)
     resp = await social_auth.github.get('user', token=token)
     profile = resp.json()
-    print('*'*10)
-    print(profile)
-    print('*' * 10)
-    return JSONResponse(profile)
+    prof = schemas.SocialAccount(
+        account_id=profile.get("id"),
+        account_url=profile.get("html_url"),
+        account_login=profile.get("login"),
+        account_name=profile.get("name"),
+        avatar_url=profile.get("avatar_url"),
+        provider="github"
+    )
+    user = service.create_social_account(db, prof)
+    # TODO add new function, return {token}
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return {
+        "access_token": create_access_token(
+            data={"user_id": user.id}, expires_delta=access_token_expires
+        ),
+        "token_type": "bearer",
+    }

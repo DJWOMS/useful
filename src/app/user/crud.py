@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from src.app.auth.security import verify_password, get_password_hash
 from src.app.base.crud_base import CRUDBase
 
-from .models import User
-from .schemas import UserCreate, UserUpdate
+from .models import User, SocialAccount
+from . import schemas
 
 
-class UserCRUD(CRUDBase[User, UserCreate, UserUpdate]):
+class UserCRUD(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
     """ CRUD for user
     """
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
@@ -21,26 +21,25 @@ class UserCRUD(CRUDBase[User, UserCreate, UserUpdate]):
     ) -> Optional[User]:
         return self.exists(db, username=username, email=email)
 
-    def create(self, db: Session, *args, schema: UserCreate) -> User:
+    def create(self, db: Session, *args, schema: schemas.UserCreate) -> User:
+        password = schema.dict().pop("password")
         db_obj = User(
-            username=schema.username,
-            email=schema.email,
-            password=get_password_hash(schema.password),
-            first_name=schema.first_name
+            **schema.dict(exclude={"password"}),
+            password=get_password_hash(password),
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def create_superuser(self, db_session: Session, *args, obj_in: UserCreate) -> User:
+    def create_superuser(self, db_session: Session, *args, schema: schemas.UserCreate) -> User:
         db_obj = User(
-            username=obj_in.username,
-            email=obj_in.email,
-            password=get_password_hash(obj_in.password),
-            first_name=obj_in.first_name,
-            is_superuser=obj_in.is_superuser,
-            is_active=obj_in.is_active,
+            username=schema.username,
+            email=schema.email,
+            password=get_password_hash(schema.password),
+            first_name=schema.first_name,
+            is_superuser=schema.is_superuser,
+            is_active=schema.is_active,
         )
         db_session.add(db_obj)
         db_session.commit()
@@ -69,4 +68,11 @@ class UserCRUD(CRUDBase[User, UserCreate, UserUpdate]):
         db.commit()
 
 
+class SocialAccountCRUD(CRUDBase[SocialAccount, schemas.SocialAccount, schemas.SocialAccount]):
+    """ CRUD for Social Account
+    """
+    pass
+
+
 user = UserCRUD(User)
+social_account = SocialAccountCRUD(SocialAccount)

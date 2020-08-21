@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, DateTime, Boolean, sql
-
+from sqlalchemy import Column, String, DateTime, Boolean, sql, Integer, ForeignKey
+from sqlalchemy.orm import relationship, backref
 from src.db.session import Base
 
 
@@ -17,4 +17,20 @@ class User(Base):
     is_staff = Column(Boolean, default=False)
     is_superuser = Column(Boolean, default=False)
     avatar = Column(String)
+
+
+class SocialAccount(Base):
+    """ Model social accounts
+    """
+    __tablename__ = "user_social_account"
+
+    account_id = Column(Integer)
+    account_url = Column(String)
+    account_login = Column(String)
+    account_name = Column(String)
+    provider = Column(String)
+
+    user_id = Column(Integer, ForeignKey('user_user.id', ondelete='CASCADE'))
+    user = relationship("User", backref=backref('social_account'))
+
 
