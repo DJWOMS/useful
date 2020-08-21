@@ -16,6 +16,7 @@ bcrypt = "^3.1.7"
 psycopg2-binary = "^2.8.5"
 Authlib = "^0.14.3"
 httpx = "^0.14.0"
+typer = "^0.3.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
