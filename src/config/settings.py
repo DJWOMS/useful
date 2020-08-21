@@ -24,9 +24,12 @@ BACKEND_CORS_ORIGINS = [
 
 # Data Base
 SQLALCHEMY_DATABASE_URI = (
-    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}/{POSTGRES_DB}"
+    f'postgresql://{os.environ.get("POSTGRES_USER")}:'
+    f'{os.environ.get("POSTGRES_PASSWORD")}@'
+    f'{os.environ.get("POSTGRES_HOST")}/'
+    f'{os.environ.get("POSTGRES_DB")}'
 )
-
+print(SQLALCHEMY_DATABASE_URI)
 USERS_OPEN_REGISTRATION = True
 
 EMAILS_FROM_NAME = PROJECT_NAME

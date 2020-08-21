@@ -27,6 +27,53 @@
 
     http://127.0.0.1:8000/docs
 
+## Разработка с Docker
+
+##### 1) Сделать форк репозитория
+
+##### 2) Клонировать репозиторий
+
+    git clone ссылка_сгенерированная_в_вашем_репозитории
+
+##### 3) В папке `src.config` файл `local_config.py-example` переименовать в `local_config.py`
+
+##### 4) В корне проекта создать .env.dev
+
+    SECRET_KEY=fuf823rg2388gc828^&%&^%^&T^&gf
+    POSTGRES_DATABASE=useful_dev
+    POSTGRES_USER=useful_user
+    POSTGRES_PASSWORD=useful_pass
+    POSTGRES_HOST=db
+
+##### 5) Создать образ
+
+    docker-compose build
+
+##### 6) Запустить контейнер
+
+    docker-compose up
+    
+##### 7) Создать миграции
+
+    docker exec -it useful_back poetry run alembic revision --autogenerate
+    
+##### 8) Выполнить миграции
+
+    docker exec -it useful_back poetry run alembic upgrade head
+    
+##### 9) Создать суперюзера
+
+    docker exec -it useful_back python scripts/createsuperuser.py
+
+##### 10) Если не выполняет команды
+
+- Войти в контейнер - _docker exec -it useful_back bash_
+- Выполнить команды без _docker exec -it useful_back_ 
+                                                        
+##### 10) Если нужно очистить БД
+
+    docker-compose down -v
+
 ## Разработка
 
 ##### 1) Сделать форк репозитория и поставить звездочку)

@@ -1,20 +1,32 @@
-version: '3.1'
+version: '3.7'
 
 services:
-
   db:
-    image: postgres
+    container_name: useful-db
+    image: postgres:12
     restart: always
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_DB: db_name
+#    env_file:
+#      - ./.env.dev
     ports:
       - 5433:5432
-  fastapi:
-    build: ./
     volumes:
-    - .:/app
+      - usefulpgdata:/var/lib/postgresql/data
+
+  back:
+    container_name: useful-back
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env.dev
+    volumes:
+      - ./:/app
     ports:
       - 8000:80
     restart: always
+    depends_on:
+      - db
+    command: /start-reload.sh
+
+volumes:
+  usefulpgdata:
