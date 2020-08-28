@@ -17,6 +17,10 @@ psycopg2-binary = "^2.8.5"
 Authlib = "^0.14.3"
 httpx = "^0.14.0"
 typer = "^0.3.2"
+tortoise-orm = "^0.16.14"
+aerich = "^0.2.2"
+asyncpg = "^0.21.0"
+Users = "^1.0.dev0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
