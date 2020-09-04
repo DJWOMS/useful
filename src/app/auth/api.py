@@ -1,3 +1,4 @@
+from fastapi import BackgroundTasks
 from datetime import timedelta
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
@@ -31,7 +32,7 @@ auth_router = APIRouter()
 @auth_router.post("/login/access-token", response_model=Token)
 def login_access_token(
         db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
-    ):
+):
     """ OAuth2 compatible token login, get an access token for future requests
     """
     user = crud.user.authenticate(
@@ -51,10 +52,10 @@ def login_access_token(
 
 
 @auth_router.post("/registration", response_model=Msg)
-def user_registration(new_user: schemas.UserCreateInRegistration, db: Session = Depends(get_db)):
+async def user_registration(new_user: schemas.UserCreateInRegistration, task: BackgroundTasks):
     """ Регистрация пользователя
     """
-    user = registration_user(new_user, db)
+    user = await registration_user(new_user, task)
     if user:
         raise HTTPException(status_code=400, detail="User already exists")
     else:
@@ -62,8 +63,8 @@ def user_registration(new_user: schemas.UserCreateInRegistration, db: Session = 
 
 
 @auth_router.post("/confirm-email", response_model=Msg)
-def confirm_email(uuid: VerificationOut, db: Session = Depends(get_db)):
-    if verify_registration_user(uuid, db):
+async def confirm_email(uuid: VerificationOut):
+    if await verify_registration_user(uuid):
         return {"msg": "Success verify email"}
     else:
         raise HTTPException(status_code=404, detail="Not found")
