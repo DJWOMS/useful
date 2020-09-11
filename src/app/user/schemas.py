@@ -1,4 +1,6 @@
 from typing import Optional
+
+from fastapi import Body, Form
 from pydantic import BaseModel, EmailStr
 from tortoise.contrib.pydantic import pydantic_model_creator
 from .models import User
@@ -36,6 +38,7 @@ class UserCreateInRegistration(BaseModel):
     email: EmailStr
     password: str
     first_name: str
+    avatar: str = None
 
     class Config:
         orm_mode = True
@@ -44,7 +47,7 @@ class UserCreateInRegistration(BaseModel):
 class UserUpdate(UserBaseInDB):
     """ Properties to receive via API on update
     """
-    password: Optional[str] = None
+    password: Optional[str] = Form(...)
 
 
 # class User(UserBaseInDB):
@@ -66,8 +69,22 @@ class SocialAccount(BaseModel):
     account_url: str
     account_login: str
     account_name: str
-    avatar_url: str
     provider: str
+    user: UserCreateInRegistration
+
+    class Config:
+        orm_mode = True
+
+
+class SocialAccountGet(BaseModel):
+    """ Schema social accounts
+    """
+    account_id: int
+    account_url: str
+    account_login: str
+    account_name: str
+    provider: str
+    avatar_url: str
 
     class Config:
         orm_mode = True
