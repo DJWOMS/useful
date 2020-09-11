@@ -25,7 +25,6 @@ class BaseService:
 
     async def update(self, schema, **kwargs):
         obj = await self.model.filter(**kwargs).update(**schema.dict(exclude_unset=True))
-        print(obj)
         return obj #await self.get_schema.from_tortoise_orm(obj)
 
     async def get(self, **kwargs):
@@ -33,3 +32,6 @@ class BaseService:
 
     async def delete(self, schema, **kwargs):
         pass
+
+    async def get_obj(self, **kwargs):
+        return await self.model.get_or_none(**kwargs)
