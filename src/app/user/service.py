@@ -35,6 +35,9 @@ class UserService(BaseService):
     async def create_user_social(self, user: schemas.UserCreateInRegistration):
         return await self.create_user(schema=user, is_active=True)
 
+    def create_superuser(self, user: schemas.UserCreateInRegistration):
+        return self.create_user(schema=user, is_active=True, is_superuser=True)
+
 
 class SocialAccountService(BaseService):
     model = models.SocialAccount
