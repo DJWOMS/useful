@@ -1,21 +1,14 @@
 from fastapi import BackgroundTasks
-from datetime import timedelta
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
 
-from starlette.responses import JSONResponse
+from src.config.social_app import social_auth, redirect_uri
 
-from src.config import settings
-from src.config.social_app import social_auth
-from src.app.base.utils.db import get_db
-
-from src.app.user import service, crud, schemas
+from src.app.user import service, schemas
 
 from .schemas import Token, Msg, VerificationOut
-from .permissions import get_current_user
-from .jwt import create_access_token
+from .jwt import create_token
 from .security import get_password_hash
 from .send_email import send_reset_password_email
 from .service import (
@@ -30,25 +23,15 @@ auth_router = APIRouter()
 
 
 @auth_router.post("/login/access-token", response_model=Token)
-def login_access_token(
-        db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
-):
+async def login_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """ OAuth2 compatible token login, get an access token for future requests
     """
-    user = crud.user.authenticate(
-        db, username=form_data.username, password=form_data.password
-    )
+    user = await service.user_s.authenticate(username=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    elif not crud.user.is_active(user):
+    elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return {
-        "access_token": create_access_token(
-            data={"user_id": user.id}, expires_delta=access_token_expires
-        ),
-        "token_type": "bearer",
-    }
+    return create_token(user.id)
 
 
 @auth_router.post("/registration", response_model=Msg)
@@ -71,55 +54,54 @@ async def confirm_email(uuid: VerificationOut):
 
 
 @auth_router.post("/password-recovery/{email}", response_model=Msg)
-def recover_password(email: str, db: Session = Depends(get_db)):
+async def recover_password(email: str, task: BackgroundTasks):
     """ Password Recovery
     """
-    user = crud.user.get_by_email(db, email=email)
+    user = await service.user_s.get_obj(email=email)
     if not user:
         raise HTTPException(
             status_code=404,
             detail="The user with this username does not exist in the system.",
         )
     password_reset_token = generate_password_reset_token(email)
-    send_reset_password_email(email_to=user.email, email=email, token=password_reset_token)
+    task.add_task(
+        send_reset_password_email, email_to=user.email, email=email, token=password_reset_token
+    )
     return {"msg": "Password recovery email sent"}
 
 
 @auth_router.post("/reset-password/", response_model=Msg)
-def reset_password(
-        token: str = Body(...), new_password: str = Body(...), db: Session = Depends(get_db)
-    ):
+async def reset_password(token: str = Body(...), new_password: str = Body(...)):
     """ Reset password
     """
     email = verify_password_reset_token(token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid token")
-    user = crud.user.get_by_email(db, email=email)
+    user = await service.user_s.get_obj(email=email)
     if not user:
         raise HTTPException(
             status_code=404,
             detail="The user with this username does not exist in the system.",
         )
-    elif not crud.user.is_active(user):
+    elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    hashed_password = get_password_hash(new_password)
-    crud.user.change_password(db, user, hashed_password)
+    await service.user_s.change_password(user, new_password)
     return {"msg": "Password updated successfully"}
 
 
 @auth_router.get('/')
-async def login(request: Request):
+async def login_oauth(request: Request):
     github = social_auth.create_client('github')
-    redirect_uri = 'http://localhost:8000/api/v1/auth/github_login'
     return await github.authorize_redirect(request, redirect_uri)
 
 
-@auth_router.get('/github_login')
-async def authorize(request: Request, db: Session = Depends(get_db)):
+@auth_router.get('/github_login', response_model=schemas.SocialAccountGet)
+async def authorize(request: Request):
+    # TODO I need add check profile exists
     token = await social_auth.github.authorize_access_token(request)
     resp = await social_auth.github.get('user', token=token)
     profile = resp.json()
-    prof = schemas.SocialAccount(
+    return schemas.SocialAccountGet(
         account_id=profile.get("id"),
         account_url=profile.get("html_url"),
         account_login=profile.get("login"),
@@ -127,12 +109,9 @@ async def authorize(request: Request, db: Session = Depends(get_db)):
         avatar_url=profile.get("avatar_url"),
         provider="github"
     )
-    user = service.create_social_account(db, prof)
-    # TODO add new function, return {token}
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return {
-        "access_token": create_access_token(
-            data={"user_id": user.id}, expires_delta=access_token_expires
-        ),
-        "token_type": "bearer",
-    }
+
+
+@auth_router.post('/create_oauth')
+async def create_oauth(profile: schemas.SocialAccount):
+    user = await service.social_account_s.create_social_account(profile)
+    return create_token(user.id)

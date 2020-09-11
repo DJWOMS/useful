@@ -3,17 +3,14 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta
 from typing import Optional
-
-from sqlalchemy.orm import Session
 from tortoise.query_utils import Q
 
 from src.config import settings
 
 from src.app.user import schemas, service, models
-# from src.app.user import crud
 from .models import Verification
 from .send_email import send_new_account_email
-from .schemas import VerificationOut, VerificationCreate
+from .schemas import VerificationOut
 
 password_reset_jwt_subject = "preset"
 
