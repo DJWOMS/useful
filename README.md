@@ -40,10 +40,10 @@
 ##### 4) В корне проекта создать .env.dev
 
     SECRET_KEY=fuf823rg2388gc828^&%&^%^&T^&gf
-    POSTGRES_DATABASE=useful_dev
+    POSTGRES_DB=useful_dev
     POSTGRES_USER=useful_user
     POSTGRES_PASSWORD=useful_pass
-    POSTGRES_HOST=db
+    POSTGRES_HOST=useful-db
 
 ##### 5) Создать образ
 

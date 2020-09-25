@@ -1,14 +1,14 @@
 version: '3.7'
 
 services:
-  db:
+  useful-db:
     container_name: useful-db
     image: postgres:12
     restart: always
     env_file:
       - ./.env.dev
     ports:
-      - 5433:5432
+      - 5432:5432
     volumes:
       - usefulpgdata:/var/lib/postgresql/data
 
@@ -25,8 +25,9 @@ services:
       - 8000:80
     restart: always
     depends_on:
-      - db
-    command: /start-reload.sh
+      - useful-db
+    tty: true
+#    command: /start-reload.sh
 
 volumes:
   usefulpgdata:

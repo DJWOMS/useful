@@ -5,6 +5,7 @@
 #
 #poetry run alembic revision --autogenerate
 
-sleep 10;
-# Run migrations
-poetry run alembic upgrade head
+#sleep 10;
+## Run migrations
+##poetry run alembic upgrade head
+#aerich init-db
