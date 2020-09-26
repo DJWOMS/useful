@@ -6,7 +6,7 @@ from tortoise.contrib.fastapi import register_tortoise
 
 from src.config import settings
 from src.app import routers
-from src.db.session import SessionLocal
+# from src.db.session import SessionLocal
 
 
 app = FastAPI(
