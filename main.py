@@ -6,13 +6,12 @@ from tortoise.contrib.fastapi import register_tortoise
 
 from src.config import settings
 from src.app import routers
-# from src.db.session import SessionLocal
 
 
 app = FastAPI(
     title="Useful",
     description="Author - DJWOMS",
-    version="0.1.0",
+    version="0.2.0",
 )
 
 
@@ -25,16 +24,6 @@ app.add_middleware(
 )
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
-
-# @app.middleware("http")
-# async def db_session_middleware(request: Request, call_next):
-#     response = Response("Internal server error", status_code=500)
-#     try:
-#         request.state.db = SessionLocal()
-#         response = await call_next(request)
-#     finally:
-#         request.state.db.close()
-#     return response
 
 app.include_router(routers.api_router, prefix=settings.API_V1_STR)
 
