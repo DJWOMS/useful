@@ -6,6 +6,7 @@ class Category(models.Model):
     """
     name = fields.CharField(max_length=150)
     parent = fields.ForeignKeyField("models.Category", related_name="children", null=True)
+    projects: fields.ReverseRelation['Project']
 
 
 class Toolkit(models.Model):
@@ -22,7 +23,9 @@ class Project(models.Model):
     description = fields.TextField()
     create_date = fields.DatetimeField(auto_now_add=True)
     user = fields.ForeignKeyField('models.User', related_name="projects")
-    category = fields.ForeignKeyField('models.Category', related_name="projects")
+    category: fields.ForeignKeyRelation[Category] = fields.ForeignKeyField(
+        'models.Category', related_name="projects"
+    )
     toolkit = fields.ForeignKeyField('models.Toolkit', related_name="projects")
     team = fields.ManyToManyField('models.User', related_name='team_projects')
 
@@ -45,4 +48,3 @@ class CommentTask(models.Model):
     task = fields.ForeignKeyField('models.Task', related_name='comments')
     message = fields.CharField(max_length=1000)
     create_date = fields.DatetimeField(auto_now_add=True)
-

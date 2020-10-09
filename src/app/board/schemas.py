@@ -1,4 +1,4 @@
-from tortoise.contrib.pydantic import pydantic_model_creator
+from tortoise.contrib.pydantic import pydantic_model_creator, PydanticModel
 from . import models
 
 
@@ -13,10 +13,18 @@ CreateToolkit = pydantic_model_creator(
 )
 
 
+class CreateProject(PydanticModel):
+    name: str
+    description: str
+    category_id: int
+    user_id: int
+    toolkit_id: int
+
+
 GetProject = pydantic_model_creator(models.Project, name='get_project')
-CreateProject = pydantic_model_creator(
-    models.Project, name='create_project', exclude_readonly=True
-)
+# CreateProject = pydantic_model_creator(
+#     models.Project, name='create_project', exclude_readonly=True,
+# )
 
 
 GetTask = pydantic_model_creator(models.Task, name='get_task')
