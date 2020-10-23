@@ -5,8 +5,18 @@ class Category(models.Model):
     """ Categories by project
     """
     name = fields.CharField(max_length=150)
-    parent = fields.ForeignKeyField("models.Category", related_name="children", null=True)
+    parent: fields.ForeignKeyNullableRelation['Category'] = fields.ForeignKeyField(
+        "models.Category", related_name="children", null=True
+    )
+    children: fields.ReverseRelation["Category"]
     projects: fields.ReverseRelation['Project']
+
+    # class PydanticMeta:
+    #     # computed = ["name_length", "team_size", "not_annotated"]
+    #     # exclude = ["manager", "gets_talked_to"]
+    #
+    #     allow_cycles = True
+    #     max_recursion = 4
 
 
 class Toolkit(models.Model):
@@ -38,7 +48,7 @@ class Task(models.Model):
     start_date = fields.DatetimeField(null=True)
     end_date = fields.DatetimeField(null=True)
     project = fields.ForeignKeyField('models.Project', related_name='tasks')
-    worker = fields.ForeignKeyField('models.User', related_name='tasks')
+    worker = fields.ForeignKeyField('models.User', related_name='tasks', null=True)
 
 
 class CommentTask(models.Model):

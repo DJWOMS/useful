@@ -27,6 +27,9 @@ class BaseService:
         obj = await self.model.filter(**kwargs).update(**schema.dict(exclude_unset=True))
         return obj #await self.get_schema.from_tortoise_orm(obj)
 
+    async def all(self):
+        return await self.get_schema.from_queryset(self.model.all())
+
     async def get(self, **kwargs):
         pass
 
