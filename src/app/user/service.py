@@ -9,6 +9,7 @@ from ..base.service_base import BaseService
 class UserService(BaseService):
     model = models.User
     create_schema = schemas.UserCreateInRegistration
+    update_schema = schemas.UserUpdate
     get_schema = schemas.User_G_Pydantic
 
     async def create_user(self, schema: schemas.UserCreateInRegistration, **kwargs):
