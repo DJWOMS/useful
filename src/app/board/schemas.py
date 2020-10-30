@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
 from tortoise.contrib.pydantic import pydantic_model_creator, PydanticModel, PydanticListModel
 from . import models
 
+from src.app.user.schemas import UserPublic
 
 class CreateCategory(PydanticModel):
     name: str
@@ -30,7 +30,7 @@ class GetCategoryProject(PydanticModel):
     class Config:
         orm_mode = True
 
-# GetCategory = pydantic_model_creator(models.Category, name='get_category')
+# GetCategoryProject = pydantic_model_creator(models.Category, name='get_category')
 
 
 class CreateToolkit(PydanticModel):
@@ -48,22 +48,27 @@ class CreateProject(PydanticModel):
     toolkit_id: int
     user_id: int
 
+    # class Config:
+    #     orm_mode = True
 
 # GetProject = pydantic_model_creator(models.Project, name='get_project')
+
 
 class Category(PydanticModel):
     id: int
     name: str
 
-    # class Config:
-    #     orm_mode = True
+    class Config:
+        orm_mode = True
 
 
 class GetProject(PydanticModel):
     name: str
     description: str
     create_date: datetime
-    category: Category
+    # category: Category
+    # toolkit: GetToolkit
+    # team: List[UserPublic]
 
     # class Config:
     #     orm_mode = True
