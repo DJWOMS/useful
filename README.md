@@ -69,7 +69,7 @@
 
     docker exec -it useful-back python scripts/createsuperuser.py
 
-##### 10) Если не выполняет команды
+##### 9) Если не выполняет команды
 
 - Войти в контейнер - _docker exec -it useful-back bash_
 - Выполнить команды без _docker exec -it useful-back_ 
@@ -77,6 +77,15 @@
 ##### 10) Если нужно очистить БД
 
     docker-compose down -v
+ 
+##### 11) Создать миграции
+
+    docker exec -it useful-back aerich migrate
+ 
+##### 12) Выполнить миграции
+
+    docker exec -it useful-back aerich upgrade
+ 
  
 ## License
 

@@ -1,5 +1,6 @@
 from typing import TypeVar, Type, Optional
 
+from fastapi import HTTPException
 from pydantic import BaseModel
 from tortoise import models
 
@@ -23,18 +24,22 @@ class BaseService:
         obj = await self.model.create(**schema.dict(exclude_unset=True), **kwargs)
         return await self.get_schema.from_tortoise_orm(obj)
 
-    async def update(self, schema, **kwargs):
-        obj = await self.model.filter(**kwargs).update(**schema.dict(exclude_unset=True))
-        return obj #await self.get_schema.from_tortoise_orm(obj)
+    async def update(self, schema, **kwargs) -> Optional[UpdateSchemaType]:
+        await self.model.filter(**kwargs).update(**schema.dict(exclude_unset=True))
+        return await self.get_schema.from_queryset_single(self.model.get(**kwargs))
 
     async def all(self):
         return await self.get_schema.from_queryset(self.model.all())
 
     async def get(self, **kwargs):
-        pass
-
-    async def delete(self, schema, **kwargs):
-        pass
+        return await self.get_schema.from_queryset_single(self.model.get(**kwargs))
 
     async def get_obj(self, **kwargs):
         return await self.model.get_or_none(**kwargs)
+
+    async def delete(self, **kwargs):
+        obj = await self.model.filter(**kwargs).delete()
+        if not obj:
+            raise HTTPException(status_code=404, detail='Object does not exist')
+
+
