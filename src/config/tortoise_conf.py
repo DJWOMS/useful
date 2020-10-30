@@ -1,15 +1,10 @@
-from src.config.settings import DATABASE_URI
+from src.config.settings import DATABASE_URI, APPS_MODELS
 
 TORTOISE_ORM = {
     "connections": {"default": DATABASE_URI},
     "apps": {
         "models": {
-            "models": [
-                "src.app.user.models",
-                "src.app.auth.models",
-                "src.app.board.models",
-                "aerich.models",
-            ],
+            "models": APPS_MODELS,
             "default_connection": "default",
         },
     },

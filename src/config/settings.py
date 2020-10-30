@@ -22,19 +22,10 @@ BACKEND_CORS_ORIGINS = [
     "http://localhost:8080",
 ]
 
-# Data Base
-# SQLALCHEMY_DATABASE_URI = (
-#     f'postgresql://{os.environ.get("POSTGRES_USER")}:'
-#     f'{os.environ.get("POSTGRES_PASSWORD")}@'
-#     f'{os.environ.get("POSTGRES_HOST")}/'
-#     f'{os.environ.get("POSTGRES_DB")}'
-# )
-
 DATABASE_URI = f'postgres://{os.environ.get("POSTGRES_USER")}:' \
-    f'{os.environ.get("POSTGRES_PASSWORD")}@' \
-    f'{os.environ.get("POSTGRES_HOST")}:5432/' \
-    f'{os.environ.get("POSTGRES_DB")}'
-
+               f'{os.environ.get("POSTGRES_PASSWORD")}@' \
+               f'{os.environ.get("POSTGRES_HOST")}:5432/' \
+               f'{os.environ.get("POSTGRES_DB")}'
 
 USERS_OPEN_REGISTRATION = True
 
@@ -44,3 +35,9 @@ EMAIL_TEMPLATES_DIR = "src/email-templates/build"
 EMAILS_ENABLED = SMTP_HOST and SMTP_PORT and EMAILS_FROM_EMAIL
 EMAIL_TEST_USER = "djwoms@gmail.com"
 
+APPS_MODELS = [
+    "src.app.user.models",
+    "src.app.auth.models",
+    "src.app.board.models",
+    "aerich.models",
+]
