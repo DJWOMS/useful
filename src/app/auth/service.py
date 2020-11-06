@@ -29,12 +29,10 @@ async def registration_user(new_user: schemas.UserCreateInRegistration, task: Ba
 
 
 async def verify_registration_user(uuid: VerificationOut) -> bool:
-    """Подтверждение email пользователя"""
+    """ Подтверждение email пользователя """
     verify = await Verification.get(link=uuid.link).prefetch_related("user")
     if verify:
-        await service.user_s.update(
-            schema=schemas.UserUpdate(**{"is_active": "true"}), id=verify.user.id
-        )
+        await service.user_s.update(schema=schemas.UserBaseInDB(is_active=True), id=verify.user.id)
         await Verification.filter(link=uuid.link).delete()
         return True
     else:
