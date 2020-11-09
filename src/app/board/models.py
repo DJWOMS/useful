@@ -70,6 +70,6 @@ class CommentTask(models.Model):
 
 
 Tortoise.init_models(["src.app.board.models"], "models")
-GetProject = pydantic_model_creator(
-    Project, name='get_project', exclude=('user', 'tasks')
-)
+# GetProject = pydantic_model_creator(
+#     Project, name='get_project', exclude=('user', 'tasks')
+# )

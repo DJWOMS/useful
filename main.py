@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from tortoise import Tortoise
 from tortoise.contrib.fastapi import register_tortoise
 
 from src.config import settings
@@ -22,9 +21,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
-
-
 app.include_router(routers.api_router, prefix=settings.API_V1_STR)
 
 
