@@ -43,10 +43,8 @@ class Project(models.Model):
         'models.Toolkit', related_name="projects"
     )
     team: fields.ManyToManyRelation[User] = fields.ManyToManyField(
-        'models.User', related_name='projects'
+        'models.User', related_name='projects', through="team_project"
     )
-
-# Todo you should add through="team_projects" in 'team' field
 
 
 class Task(models.Model):
@@ -69,7 +67,7 @@ class CommentTask(models.Model):
     create_date = fields.DatetimeField(auto_now_add=True)
 
 
-Tortoise.init_models(["src.app.board.models"], "models")
+# Tortoise.init_models(["src.app.board.models"], "models")
 # GetProject = pydantic_model_creator(
 #     Project, name='get_project', exclude=('user', 'tasks')
 # )
