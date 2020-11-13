@@ -6,6 +6,6 @@ TORTOISE_ORM = {
         "models": {
             "models": APPS_MODELS,
             "default_connection": "default",
-        },
+        }
     },
 }
