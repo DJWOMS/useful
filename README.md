@@ -44,7 +44,7 @@
 ##### 3) В корне проекта создать .env.dev
 
     SECRET_KEY=fuf823rg2388gc828^&%&^%^&T^&gf
-    SERVER_HOST=
+    SERVER_HOST=127.0.0.1
 
     # Data Base
     POSTGRES_DB=useful_dev
