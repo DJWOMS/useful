@@ -41,17 +41,28 @@
 
     git clone ссылка_сгенерированная_в_вашем_репозитории
 
-##### 3) В папке `src.config` файл `local_config.py-example` переименовать в `local_config.py`
-
-    прописать конект к smtp
-
-##### 4) В корне проекта создать .env.dev
+##### 3) В корне проекта создать .env.dev
 
     SECRET_KEY=fuf823rg2388gc828^&%&^%^&T^&gf
+    SERVER_HOST=
+
+    # Data Base
     POSTGRES_DB=useful_dev
     POSTGRES_USER=useful_user
     POSTGRES_PASSWORD=useful_pass
     POSTGRES_HOST=useful-db
+    
+    # Email
+    SMTP_TLS=True
+    SMTP_PORT=587
+    SMTP_HOST=smtp
+    SMTP_USER=robot@your.com
+    SMTP_PASSWORD=pass
+    EMAILS_FROM_EMAIL=robot@your.com
+
+##### 4) В папке src.config файл social_app.py-exp переименовать в social_app.py
+    
+    прописать свои данные от app GitHub
 
 ##### 5) Создать образ
 

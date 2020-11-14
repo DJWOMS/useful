@@ -1,8 +1,7 @@
 import os
-from .local_config import *
 
 PROJECT_NAME = "UseFul"
-SERVER_HOST = 'http://127.0.0.1:8000'
+SERVER_HOST = os.environ.get("SERVER_HOST")
 
 # Secret key
 SECRET_KEY = b"awubsyb872378t^*TG8y68&*&&*8y8yg9POB)*896ft7CR^56dfYUv"
@@ -32,6 +31,15 @@ USERS_OPEN_REGISTRATION = True
 EMAILS_FROM_NAME = PROJECT_NAME
 EMAIL_RESET_TOKEN_EXPIRE_HOURS = 48
 EMAIL_TEMPLATES_DIR = "src/email-templates/build"
+
+# Email
+SMTP_TLS = os.environ.get("SMTP_TLS")
+SMTP_PORT = os.environ.get("SMTP_PORT")
+SMTP_HOST = os.environ.get("SMTP_HOST")
+SMTP_USER = os.environ.get("SMTP_USER")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+EMAILS_FROM_EMAIL = os.environ.get("EMAILS_FROM_EMAIL")
+
 EMAILS_ENABLED = SMTP_HOST and SMTP_PORT and EMAILS_FROM_EMAIL
 EMAIL_TEST_USER = "djwoms@gmail.com"
 
