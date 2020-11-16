@@ -88,5 +88,4 @@ class Comment(models.Model):
         return "{} - {}".format(self.user, self.post)
 
 
-
 Tortoise.init_models(["src.app.blog.models"], "models")
