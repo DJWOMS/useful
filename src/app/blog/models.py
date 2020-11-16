@@ -1,4 +1,7 @@
-from tortoise import models, fields
+from tortoise import models, fields, Tortoise
+
+from src.app.user.models import User
+from src.config import settings
 
 
 class BlogCategory(models.Model):
@@ -15,6 +18,13 @@ class BlogCategory(models.Model):
     def __str__(self):
         return self.name
 
+    class PydanticMeta:
+    #     exclude_raw_fields = False
+        backward_relations = False
+        exclude = ('posts', 'parent')
+        allow_cycles = True
+        max_recursion = 3
+
 
 class Tag(models.Model):
     """ Tags class """
@@ -27,7 +37,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     """ Article class """
-    author: fields.ForeignKeyRelation['models.User'] = fields.ForeignKeyField(
+    author: fields.ForeignKeyRelation['User'] = fields.ForeignKeyField(
         'models.User', related_name='posts', on_delete=fields.CASCADE
     )
     tag: fields.ManyToManyRelation["Tag"] = fields.ManyToManyField(
@@ -46,25 +56,37 @@ class Post(models.Model):
     viewed = fields.IntField(default=0)
     description = fields.TextField(max_length=300)
 
+    comments: fields.ReverseRelation["Comment"]
+
     def __str__(self):
         return self.title
 
 
-# class Comment(models.Model):
-#     """ Comment class """
-#     user = fields.ForeignKeyField('models.User', on_delete=models.CASCADE)
-#     post = fields.ForeignKeyField('models.Post', related_name="comments", on_delete=models.CASCADE)
-#     parent = fields.ForeignKeyField(
-#         "models.Comment",
-#         on_delete=fields.SET_NULL,
-#         null=True,
-#         related_name='children'
-#     )
-#     text = fields.TextField(max_length=2000)
-#     create_at = fields.DatetimeField(auto_now_add=True)
-#     update_at = fields.DatetimeField(auto_now=True)
-#     is_published = fields.BooleanField(default=True)
-#     is_deleted = fields.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return "{} - {}".format(self.user, self.post)
+class Comment(models.Model):
+    """ Comment class """
+    user: fields.ForeignKeyRelation['User'] = fields.ForeignKeyField(
+        'models.User', related_name="comments", on_delete=fields.CASCADE
+    )
+    post: fields.ForeignKeyRelation[Post] = fields.ForeignKeyField(
+        'models.Post', related_name="comments", on_delete=fields.CASCADE
+    )
+    parent: fields.ForeignKeyNullableRelation['Comment'] = fields.ForeignKeyField(
+        "models.Comment",
+        on_delete=fields.SET_NULL,
+        null=True,
+        related_name='children'
+    )
+    text = fields.TextField(max_length=2000)
+    create_at = fields.DatetimeField(auto_now_add=True)
+    update_at = fields.DatetimeField(auto_now=True)
+    is_published = fields.BooleanField(default=True)
+    is_deleted = fields.BooleanField(default=False)
+
+    children: fields.ReverseRelation["Comment"]
+
+    def __str__(self):
+        return "{} - {}".format(self.user, self.post)
+
+
+
+Tortoise.init_models(["src.app.blog.models"], "models")
