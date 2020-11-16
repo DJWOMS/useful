@@ -9,8 +9,9 @@ category_router = APIRouter()
 
 
 @category_router.post('/', response_model=schemas.GetCategory)
-async def create_category(schema: schemas.CreateCategory,
-                          user: models.User = Depends(get_superuser)):
+async def create_category(
+        schema: schemas.CreateCategory, user: models.User = Depends(get_superuser)
+):
     return await service.category_s.create(schema)
 
 

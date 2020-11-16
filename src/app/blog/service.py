@@ -8,4 +8,11 @@ class BlogCategoryService(BaseService):
     get_schema = schemas.GetCategory
 
 
+class TagService(BaseService):
+    model = models.Tag
+    create_schema = schemas.CreateTag
+    get_schema = schemas.GetTag
+
+
 category_s = BlogCategoryService()
+tag_s = TagService()
