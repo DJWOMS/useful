@@ -29,8 +29,8 @@ services:
     restart: always
     depends_on:
       - useful-db
-#    command: /start-reload.sh
-#    tty: true
+#    command: ./start-reload.sh
+    tty: true
 
 
 volumes:

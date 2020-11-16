@@ -1,4 +1,4 @@
-from tortoise import fields, models
+from tortoise import fields, models, Tortoise
 
 
 class User(models.Model):
@@ -14,7 +14,7 @@ class User(models.Model):
     is_staff = fields.BooleanField(default=False)
     is_superuser = fields.BooleanField(default=False)
     avatar = fields.CharField(max_length=100, null=True)
-    social_accounts: fields.ReverseRelation['SocialAccount']
+    # social_accounts: fields.ReverseRelation['SocialAccount']
 
 
 class SocialAccount(models.Model):
@@ -28,4 +28,6 @@ class SocialAccount(models.Model):
         "models.User", related_name="social_accounts"
     )
 
+
+# Tortoise.init_models(["src.app.user.models"], "models")
 
