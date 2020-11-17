@@ -22,7 +22,7 @@ class BaseService:
     # def __init__(self, model: Type[ModelType]):
     #     self.model = model
 
-    async def create(self, schema, **kwargs) -> Optional[CreateSchemaType]:
+    async def create(self, schema, *args, **kwargs) -> Optional[CreateSchemaType]:
         obj = await self.model.create(**schema.dict(exclude_unset=True), **kwargs)
         return await self.get_schema.from_tortoise_orm(obj)
 

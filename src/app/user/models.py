@@ -16,6 +16,9 @@ class User(models.Model):
     avatar = fields.CharField(max_length=100, null=True)
     # social_accounts: fields.ReverseRelation['SocialAccount']
 
+    class PydanticMeta:
+        exclude = ('comments', 'password')
+
 
 class SocialAccount(models.Model):
     """ Model social accounts """

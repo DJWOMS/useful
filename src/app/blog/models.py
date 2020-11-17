@@ -1,7 +1,7 @@
+import tortoise
 from tortoise import models, fields, Tortoise
 
 from src.app.user.models import User
-from src.config import settings
 
 
 class BlogCategory(models.Model):
@@ -19,7 +19,6 @@ class BlogCategory(models.Model):
         return self.name
 
     class PydanticMeta:
-    #     exclude_raw_fields = False
         backward_relations = False
         exclude = ('posts', 'parent')
         allow_cycles = True
@@ -52,14 +51,18 @@ class Post(models.Model):
     create_at = fields.DatetimeField(auto_now_add=True)
     publish_at = fields.DatetimeField(auto_now=True)
     image = fields.CharField(max_length=500, null=True)
+    # TODO published переименовать на is_published
     published = fields.BooleanField(default=True)
     viewed = fields.IntField(default=0)
     description = fields.TextField(max_length=300)
-
+    # TODO убрать лишние связи, чтобы не тянуть лишнюю инфу из БД
     comments: fields.ReverseRelation["Comment"]
 
     def __str__(self):
         return self.title
+
+    class PydanticMeta:
+        exclude = ('comments',)
 
 
 class Comment(models.Model):
@@ -86,6 +89,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.user, self.post)
+
+    class PydanticMeta:
+        exclude = ('post',)
 
 
 Tortoise.init_models(["src.app.blog.models"], "models")
