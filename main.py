@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from tortoise import Tortoise
 from tortoise.contrib.fastapi import register_tortoise
 
 from src.config import settings
@@ -34,12 +33,6 @@ register_tortoise(
     generate_schemas=False,
     add_exception_handlers=True,
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    Tortoise.init_models(settings.APPS_MODELS, "models")
-
 
 #
 # if __name__ == "__main__":

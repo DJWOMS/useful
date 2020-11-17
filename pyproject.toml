@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "useful"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = ["DJWOMS <socanime@gmail.com>"]
 
@@ -15,7 +15,7 @@ psycopg2-binary = "^2.8.5"
 Authlib = "^0.14.3"
 httpx = "^0.14.0"
 typer = "^0.3.2"
-tortoise-orm = "^0.16.14"
+tortoise-orm = "^0.16.18"
 aerich = "^0.3.3"
 asyncpg = "^0.21.0"
 

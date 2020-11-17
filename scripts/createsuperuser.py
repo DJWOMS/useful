@@ -1,21 +1,27 @@
-import typer
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from tortoise import Tortoise, run_async
+from src.config import settings
 from src.app.user.service import user_s
 from src.app.user.schemas import UserCreateInRegistration
 
 
-def main():
+async def main():
     """ Создание супер юзера
     """
-    typer.echo("Create superuser")
-    name = typer.prompt("Username")
-    email = typer.prompt("Email")
-    first_name = typer.prompt("First name")
-    password = typer.prompt("Password")
-    super_user = user_s.get_obj(username=name, email=email)
+    await Tortoise.init(
+        db_url=settings.DATABASE_URI,
+        modules={"models": settings.APPS_MODELS},
+    )
+    print("Create superuser")
+    name = input("Username: ")
+    email = input("Email: ")
+    first_name = input("First name: ")
+    password = input("Password: ")
+    super_user = await user_s.get_username_email(username=name, email=email)
     if not super_user:
         user_in = UserCreateInRegistration(
             username=name,
@@ -23,12 +29,11 @@ def main():
             password=password,
             first_name=first_name,
         )
-        user_s.create_superuser(schema=user_in)
-        mess = typer.style("Success", fg=typer.colors.GREEN)
+        await user_s.create_superuser(schema=user_in)
+        print("Success")
     else:
-        mess = typer.style("Error, user existing", fg=typer.colors.RED)
-    typer.echo(mess)
+        print("Error, user existing")
 
 
 if __name__ == '__main__':
-    typer.run(main)
+    run_async(main())
