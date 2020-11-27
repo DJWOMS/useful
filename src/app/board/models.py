@@ -27,6 +27,12 @@ class Toolkit(models.Model):
     parent = fields.ForeignKeyField("models.Toolkit", related_name="children", null=True)
     projects: fields.ReverseRelation['Project']
 
+    class PydanticMeta:
+        backward_relations = False
+        exclude = ["projects", "parent"]
+        allow_cycles = True
+        max_recursion = 4
+
 
 class Project(models.Model):
     """ Model project
