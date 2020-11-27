@@ -51,6 +51,10 @@ class Project(models.Model):
         'models.User', related_name='projects', through="team_project"
     )
 
+    class PydanticMeta:
+        backward_relations = False
+        exclude = ["category__children"]
+
 
 class Task(models.Model):
     """ Model task by project
