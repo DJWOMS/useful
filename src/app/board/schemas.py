@@ -1,61 +1,42 @@
 from datetime import datetime
 from typing import List
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator,\
-    PydanticModel, PydanticListModel
+
+from pydantic.main import BaseModel
+from tortoise.contrib.pydantic import pydantic_model_creator, PydanticModel
+from ..user.schemas import UserPublic
 from . import models
 
-from src.app.user.schemas import UserPublic
 
-
-class CreateCategory(PydanticModel):
-    name: str
-    parent_id: int = None
-
-
-# class GetCategory(PydanticModel):
-#     id: int
-#     name: str
-#     # children: List[int] = None
-
+CreateCategory = pydantic_model_creator(models.Category, exclude_readonly=True)
 GetCategory = pydantic_model_creator(models.Category)
 
 
-class Project(PydanticModel):
-    name: str
-    description: str
-    create_date: datetime
-
-
-class GetCategoryProject(PydanticModel):
+class OutCategory(BaseModel):
     id: int
     name: str
-    projects: List[Project]
-
-    class Config:
-        orm_mode = True
-
-# GetCategoryProject = pydantic_model_creator(models.Category, name='get_category')
 
 
-class CreateToolkit(PydanticModel):
-    name: str
-    parent_id: int = None
-
-
+CreateToolkit = pydantic_model_creator(models.Toolkit, exclude_readonly=True)
 GetToolkit = pydantic_model_creator(models.Toolkit, name='get_toolkit')
 
 
-class CreateProject(PydanticModel):
+class OutToolkit(BaseModel):
+    id: int
+    name: str
+
+
+CreateProject = pydantic_model_creator(models.Project, exclude=('user_id',), exclude_readonly=True)
+GetProject = pydantic_model_creator(models.Project, name='get_project')
+
+
+class OutProject(PydanticModel):
+    id: int
     name: str
     description: str
-    category_id: int
-    toolkit_id: int
-    user_id: int
-
-    # class Config:
-    #     orm_mode = True
-
-# GetProject = pydantic_model_creator(models.Project, name='get_project')
+    create_date: datetime
+    user: UserPublic
+    category: OutCategory
+    toolkit: OutToolkit
 
 
 class Category(PydanticModel):
@@ -64,22 +45,6 @@ class Category(PydanticModel):
 
     class Config:
         orm_mode = True
-
-
-class GetProject(PydanticModel):
-    name: str
-    description: str
-    create_date: datetime
-    # category: Category
-    # toolkit: GetToolkit
-    # team: List[UserPublic]
-
-    # class Config:
-    #     orm_mode = True
-
-    # user = fields.ForeignKeyField('models.User', related_name="projects")
-    # toolkit = fields.ForeignKeyField('models.Toolkit', related_name="projects")
-    # team = fields.ManyToManyField('models.User', related_name='team_projects')
 
 
 class CreateTask(PydanticModel):
