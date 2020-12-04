@@ -59,7 +59,7 @@ class UserUpdate(UserBaseInDB):
 class UserInDB(UserBaseInDB):
     """ Additional properties stored in DB
     """
-    password: str
+    # password: str
 
 
 class SocialAccount(BaseModel):

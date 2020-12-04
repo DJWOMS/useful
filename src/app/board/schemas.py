@@ -76,3 +76,8 @@ class CreateCommentTask(PydanticModel):
 
 
 GetCommentTask = pydantic_model_creator(models.CommentTask, name='get_comment_task')
+
+
+class CreateTeam(BaseModel):
+    project: int
+    team: List[int]
