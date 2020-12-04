@@ -1,3 +1,4 @@
+from src.app.user.models import User
 from . import schemas, models
 from ..base.service_base import BaseService
 
@@ -18,6 +19,15 @@ class ProjectService(BaseService):
     model = models.Project
     create_schema = schemas.CreateProject
     get_schema = schemas.GetProject
+
+    async def create_team(self, schema: schemas.CreateTeam, user: User):
+        # TODO I need to create invites to users for a team
+        # TODO Maybe I need to create other model for a team.
+        # TODO Project O2O Team or Project FK Team
+        _project = await self.get_obj(id=schema.project, user=user)
+        _users = await User.filter(id__in=schema.team)
+        await _project.team.add(*_users)
+        return schema
 
 
 class TaskService(BaseService):

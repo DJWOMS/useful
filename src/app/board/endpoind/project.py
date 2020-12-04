@@ -27,3 +27,13 @@ async def update_project(
 @project_router.delete('/{pk}', status_code=204)
 async def delete_project(pk: int, user: models.User = Depends(get_user)):
     return await service.project_s.delete(id=pk, user_id=user.id)
+
+
+@project_router.post('/team', response_model=schemas.CreateTeam)
+async def create_team(schema: schemas.CreateTeam, user: models.User = Depends(get_user)):
+    return await service.project_s.create_team(schema, user)
+
+
+# @project_router.put('/team/', response_model=schemas.CreateTeam)
+# async def create_team(schema: schemas.CreateTeam):
+#     return await service.project_s.create_team(schema)
