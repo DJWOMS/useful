@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 
 from .. import schemas, service, models
 from ...auth.permissions import get_user
@@ -7,9 +7,12 @@ from ...auth.permissions import get_user
 project_router = APIRouter()
 
 
-@project_router.post('/', response_model=schemas.OutProject)
-async def create_project(schema: schemas.CreateProject, user: models.User = Depends(get_user)):
-    return await service.project_s.create(schema, user_id=user.id)
+@project_router.post('/') #, response_model=schemas.OutProject)
+async def create_project(
+        schema: schemas.CreateProject, repo_name: str = Body(...), user: models.User = Depends(get_user)
+):
+    return await service.project_s.create_project(schema, user, repo_name)
+    # return await service.project_s.create(schema, user_id=user.id)
 
 
 @project_router.get('/', response_model=List[schemas.OutProject])

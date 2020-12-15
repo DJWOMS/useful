@@ -56,6 +56,18 @@ class Project(models.Model):
         exclude = ["category__children"]
 
 
+class Repository(models.Model):
+    repo_id = fields.IntField()
+    created_at = fields.DatetimeField()
+    updated_at = fields.DatetimeField()
+    stars = fields.IntField()
+    forks = fields.IntField()
+    watch = fields.IntField()
+    topics = fields.CharField(max_length=1000)
+    languages = fields.CharField(max_length=1000)
+    description = fields.CharField(max_length=1000)
+
+
 class Task(models.Model):
     """ Model task by project
     """
